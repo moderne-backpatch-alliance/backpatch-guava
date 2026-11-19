@@ -401,9 +401,8 @@ public final class Files {
    * and that it will not be called thousands of times per second.
    *
    * @return the newly-created directory
-   * @throws IllegalStateException if the directory could not be created
-   * @throws UnsupportedOperationException if the system does not support creating temporary
-   *     directories securely
+   * @throws IllegalStateException if the directory could not be created, such as if the system does
+   *     not support creating temporary directories securely
    */
   public static File createTempDir() {
     return TempFileCreator.INSTANCE.createTempDir();
