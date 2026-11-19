@@ -13,6 +13,14 @@
 
 package com.google.common.util.concurrent;
 
+import com.google.common.primitives.Bytes;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.ObjectStreamConstants;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 /**
@@ -349,6 +357,26 @@ public class AtomicDoubleArrayTest extends JSR166TestCase {
     for (int i = 0; i < VALUES.length; i++) {
       assertBitEquals(a.get(i), b.get(i));
     }
+  }
+
+  public void testDeserializationWithHugeLengthThrowsIOException() throws Exception {
+    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+    ObjectOutputStream out = new ObjectOutputStream(bytes);
+    out.writeObject(new AtomicDoubleArray(new double[] {1.0, 2.0, 3.0}));
+    out.close();
+    byte[] stream = bytes.toByteArray();
+    byte[] lengthAndThreeDoubles = {ObjectStreamConstants.TC_BLOCKDATA, 4 + 3 * 8, 0, 0, 0, 3};
+    int lengthField = Bytes.indexOf(stream, lengthAndThreeDoubles) + 2;
+    assertTrue(lengthField >= 2);
+    ByteBuffer.wrap(stream).putInt(lengthField, Integer.MAX_VALUE);
+
+    Throwable thrown = null;
+    try {
+      new ObjectInputStream(new ByteArrayInputStream(stream)).readObject();
+    } catch (Throwable t) {
+      thrown = t;
+    }
+    assertTrue(String.valueOf(thrown), thrown instanceof IOException);
   }
 
   /**
