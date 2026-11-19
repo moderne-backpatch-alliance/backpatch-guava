@@ -1,6 +1,6 @@
 schema: osera-patch-evidence/0.1.0
 producer: moderne
-release: 20.0.1-backpatch-00002
+release: 20.0.1-backpatch-00003
 baseline: v20.0+backpatch.baseline
 fixes:
   - cve: CVE-2026-102554
@@ -18,7 +18,7 @@ fixes:
     basis: adapted
     artifacts:
       - com.google.guava:guava
-    note: New in this release; ported onto 20.0; fixed at 20.0.1-backpatch-00002 (backpatch-guava@798415e..dc5605f).
+    note: Carried from 20.0.1-backpatch-00002; ported onto 20.0; fixed at 20.0.1-backpatch-00002 (backpatch-guava@798415e..dc5605f).
   - cve: CVE-2020-8908
     upstream_fix_url: https://github.com/advisories/GHSA-5mg8-w23w-74h3
     advisory_url: https://nvd.nist.gov/vuln/detail/CVE-2020-8908
@@ -26,12 +26,21 @@ fixes:
     basis: adapted
     artifacts:
       - com.google.guava:guava
-    note: New in this release; ported onto 20.0; fixed at 20.0.1-backpatch-00002 (backpatch-guava@798415e..dc5605f).
+    note: Carried from 20.0.1-backpatch-00002; ported onto 20.0; fixed at 20.0.1-backpatch-00002 (backpatch-guava@798415e..dc5605f).
+  - cve: CVE-2018-10237
+    upstream_fix_url: https://github.com/advisories/GHSA-mvr2-9pj6-7w5j
+    advisory_url: https://nvd.nist.gov/vuln/detail/CVE-2018-10237
+    patch_commit_url: https://github.com/moderne-backpatch-alliance/backpatch-guava/compare/c744457~1...4d24146
+    basis: adapted
+    artifacts:
+      - com.google.guava:guava
+      - com.google.guava:guava-gwt
+    note: New in this release; ported onto 20.0; fixed at 20.0.1-backpatch-00003 (backpatch-guava@c744457..4d24146).
 tests:
-  commit: dc5605fb826168a6215d18c75faa5b499adf35fe
+  commit: 4d241469e97a88e162d503efe4021c571ffea09a
   command: mvn -B -Dmaven.javadoc.skip=true -Dgwt.test.include=**/DoesNotMatchAnyTests.java -Dmaven.test.failure.ignore=true verify (upstream's CI command at v20.0, GWT tests left out as there); the report decides -Dtest=<every **/*Test.java class of guava-tests and guava-testlib but ClassPathTest>
   runtime: Zulu 1.7.0_79 (tests, forked) under Maven 3.9.16 on Zulu 8.0.382
-  report: guava-20.0.1-backpatch-00002-tests.zip
-  report_sha256: d5e410af367d73134f6376a3a05890a34e79047998ab0845801af766174a6337
+  report: guava-20.0.1-backpatch-00003-tests.zip
+  report_sha256: 8d29382469336688ce78aee921fdd07665756d72af76aeda6fbd7da95ed85584
   result: pass
-  note: "823205 tests at the patch commit, 0 of them skipped by the suite, 0 failed, 0 errors. Left out of the run as accepted exceptions: com.google.common.reflect.ClassPathTest#testExistsThrowsSecurityException (on Zulu 1.7.0_79 the test's SecurityManager refuses the JDK's own FilePermission; errors at the untouched baseline 20.0 too (Peter, 2026-11-19, 314)). Ran on this Mac outside counter.py (lines/guava-20.local/run2.sh): Maven 3.9.16 on Zulu 8.0.382, tests forked on Zulu 1.7.0_79 (-Djvm), the era JDK; upstream's CI command at v20.0 plus a -Dtest list of every **/*Test.java class of guava-tests and guava-testlib but ClassPathTest, because surefire 2.7.2 cannot leave out one method. ClassPathTest's other 32 tests leave the run with it; at the untouched baseline 20.0 the class ran 33 tests, 32 passed and testExistsThrowsSecurityException errored (lines/guava-20.local/reports-base.tgz). Main classes compiled with Zulu 1.7.0_79's javac (Central's 20.0 jar names Build-Jdk 1.7.0-google-v5)."
+  note: "825424 tests at the patch commit, 0 of them skipped by the suite, 0 failed, 0 errors. Left out of the run as accepted exceptions: com.google.common.reflect.ClassPathTest#testExistsThrowsSecurityException (on Zulu 1.7.0_79 the test's SecurityManager refuses the JDK's own FilePermission; errors at the untouched baseline 20.0 too (Peter, 2026-11-19, 314)). Ran on this Mac outside counter.py (lines/guava-20.local/run2.sh): Maven 3.9.16 on Zulu 8.0.382, tests forked on Zulu 1.7.0_79 (-Djvm), the era JDK; upstream's CI command at v20.0 plus a -Dtest list of every **/*Test.java class of guava-tests and guava-testlib but ClassPathTest, because surefire 2.7.2 cannot leave out one method. ClassPathTest's other 32 tests leave the run with it; at the untouched baseline 20.0 the class ran 33 tests, 32 passed and testExistsThrowsSecurityException errored (lines/guava-20.local/reports-base.tgz). Not in this report: guava-gwt/test/com/google/common/primitives/ImmutableLongArrayTest_gwt.java (GWT tests are left out, as upstream's CI command at v20.0 does; run separately under GWT's htmlunit: 29 tests, 0 failures). Main classes compiled with Zulu 1.7.0_79's javac (Central's 20.0 jar names Build-Jdk 1.7.0-google-v5)."
