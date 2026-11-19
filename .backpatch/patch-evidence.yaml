@@ -1,0 +1,21 @@
+schema: osera-patch-evidence/0.1.0
+producer: moderne
+release: 20.0.1-backpatch-00001
+baseline: v20.0+backpatch.baseline
+fixes:
+  - cve: CVE-2026-102554
+    upstream_fix_url: https://github.com/google/guava/commit/b931fe9d6d5cf00bc55714ad3308d086f71850fe
+    advisory_url: https://nvd.nist.gov/vuln/detail/CVE-2026-102554
+    patch_commit_url: https://github.com/moderne-backpatch-alliance/backpatch-guava/commit/0b7dea0
+    basis: adapted
+    artifacts:
+      - com.google.guava:guava
+    note: New in this release; ported onto 20.0; fixed at 20.0.1-backpatch-00001 (backpatch-guava@0b7dea0).
+tests:
+  commit: 0b7dea0607ab1ce9c17c76ee87ed999a686040b9
+  command: mvn -B -Dmaven.javadoc.skip=true -Dgwt.test.include=**/DoesNotMatchAnyTests.java -Dmaven.test.failure.ignore=true verify (upstream's CI command at v20.0, GWT tests left out as there); the report decides -Dtest=<every **/*Test.java class of guava-tests and guava-testlib but ClassPathTest>
+  runtime: Zulu 1.7.0_79 (tests, forked) under Maven 3.9.16 on Zulu 8.0.382
+  report: guava-20.0.1-backpatch-00001-tests.zip
+  report_sha256: f6b0561974c9b7b6b1f41b2d84c3823725af5f24064862b41afbd769284c7134
+  result: pass
+  note: "823203 tests at the patch commit, 0 of them skipped by the suite, 0 failed, 0 errors. Left out of the run as accepted exceptions: com.google.common.reflect.ClassPathTest#testExistsThrowsSecurityException (on Zulu 1.7.0_79 the test's SecurityManager refuses the JDK's own FilePermission; errors at the untouched baseline 20.0 too (Peter, 2026-11-19, 314)). Ran on this Mac outside counter.py (lines/guava-20.local/run2.sh): Maven 3.9.16 on Zulu 8.0.382, tests forked on Zulu 1.7.0_79 (-Djvm), the era JDK; upstream's CI command at v20.0 plus a -Dtest list of every **/*Test.java class of guava-tests and guava-testlib but ClassPathTest, because surefire 2.7.2 cannot leave out one method. ClassPathTest's other 32 tests leave the run with it; at the untouched baseline 20.0 the class ran 33 tests, 32 passed and testExistsThrowsSecurityException errored (lines/guava-20.local/reports-base.tgz). Main classes compiled with Zulu 1.7.0_79's javac (Central's 20.0 jar names Build-Jdk 1.7.0-google-v5)."
