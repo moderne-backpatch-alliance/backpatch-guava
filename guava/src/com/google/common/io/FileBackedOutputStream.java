@@ -14,6 +14,8 @@
 
 package com.google.common.io;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.annotations.Beta;
 import com.google.common.annotations.GwtIncompatible;
 import com.google.common.annotations.VisibleForTesting;
@@ -29,6 +31,14 @@ import java.io.OutputStream;
 /**
  * An {@link OutputStream} that starts buffering to a byte array, but switches to file buffering
  * once the data reaches a configurable size.
+ *
+ * <p>When this stream creates a temporary file, it restricts the file's permissions to the current
+ * user or, in the case of Android, the current app. If that is not possible (as is the case under
+ * the very old Android Ice Cream Sandwich release), then this stream throws an exception instead of
+ * creating a file that would be more accessible. (This behavior is new in Guava 32.0.0. Previous
+ * versions would create a file that is more accessible, as discussed in <a
+ * href="https://github.com/google/guava/issues/2575">Guava issue 2575</a>. TODO: b/283778848 - Fill
+ * in CVE number once it's available.)
  *
  * <p>This class is thread-safe.
  *
@@ -69,6 +79,7 @@ public final class FileBackedOutputStream extends OutputStream {
    * {@link ByteSource} returned by {@link #asByteSource} is finalized.
    *
    * @param fileThreshold the number of bytes before the stream should switch to buffering to a file
+   * @throws IllegalArgumentException if {@code fileThreshold} is negative
    */
   public FileBackedOutputStream(int fileThreshold) {
     this(fileThreshold, false);
@@ -81,8 +92,11 @@ public final class FileBackedOutputStream extends OutputStream {
    * @param fileThreshold the number of bytes before the stream should switch to buffering to a file
    * @param resetOnFinalize if true, the {@link #reset} method will be called when the
    *     {@link ByteSource} returned by {@link #asByteSource} is finalized
+   * @throws IllegalArgumentException if {@code fileThreshold} is negative
    */
   public FileBackedOutputStream(int fileThreshold, boolean resetOnFinalize) {
+    checkArgument(
+        fileThreshold >= 0, "fileThreshold must be non-negative, but was %s", fileThreshold);
     this.fileThreshold = fileThreshold;
     this.resetOnFinalize = resetOnFinalize;
     memory = new MemoryOutput();
@@ -192,7 +206,7 @@ public final class FileBackedOutputStream extends OutputStream {
    */
   private void update(int len) throws IOException {
     if (file == null && (memory.getCount() + len > fileThreshold)) {
-      File temp = File.createTempFile("FileBackedOutputStream", null);
+      File temp = TempFileCreator.INSTANCE.createTempFile("FileBackedOutputStream");
       if (resetOnFinalize) {
         // Finalizers are not guaranteed to be called on system shutdown;
         // this is insurance.
